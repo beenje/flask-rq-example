@@ -1,0 +1,13 @@
+version: '2'
+services:
+  web:
+    build: .
+    image: flaskrqexample
+    container_name: flaskrqexample_web
+    environment:
+      LOCAL_SETTINGS: /app/settings.cfg
+    command: python manage.py runserver --host 0.0.0.0
+    ports:
+    - "5000:5000"
+    volumes:
+    - .:/app
