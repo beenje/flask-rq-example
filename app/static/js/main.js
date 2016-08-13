@@ -22,17 +22,17 @@ $(document).ready(function() {
 
   // submit form
   $("#submit").on('click', function() {
-    flash_alert("Running " + $("#task").val() + "...", "info");
+    var task = $("#task").val();
     $.ajax({
       url: $SCRIPT_ROOT + "/_run_task",
       data: $("#taskForm").serialize(),
       method: "POST",
       dataType: "json",
       success: function(data) {
-        flash_alert(data.result, "success");
+        flash_alert("Job " + data.job_id + " started...", "info", false);
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        flash_alert(JSON.parse(jqXHR.responseText).message, "danger");
+        flash_alert("Failed to start " + task, "danger");
       }
     });
   });

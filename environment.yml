@@ -24,5 +24,7 @@ dependencies:
   - dominate==2.2.1
   - flask-bootstrap==3.3.6.0
   - flask-script==2.0.5
+  - redis==2.10.5
+  - rq==0.6.0
   - visitor==0.1.3
 

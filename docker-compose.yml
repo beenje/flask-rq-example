@@ -11,3 +11,17 @@ services:
     - "5000:5000"
     volumes:
     - .:/app
+    depends_on:
+    - redis
+  worker:
+    image: flaskrqexample
+    container_name: flaskrqexample_worker
+    environment:
+      LOCAL_SETTINGS: /app/settings.cfg
+    command: python manage.py runworker
+    volumes:
+    - .:/app
+    depends_on:
+    - redis
+  redis:
+    image: redis:3.2
