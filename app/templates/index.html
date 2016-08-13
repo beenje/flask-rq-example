@@ -11,10 +11,14 @@
               {{ form.hidden_tag() }}
               {{ wtf.form_field(form.task) }}
               <div class="form-group">
-                <button type="submit" class="btn btn-default" id="submit">Run</button>
+                <button type="button" class="btn btn-default" id="submit">Run</button>
               </div>
             </form>
           </div>
         </div>
       </div>
+{% endblock %}
+
+{% block app_scripts %}
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}
