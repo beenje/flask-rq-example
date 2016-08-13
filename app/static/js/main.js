@@ -20,6 +20,31 @@ $(document).ready(function() {
     });
   }
 
+  function check_job_status(status_url) {
+    $.getJSON(status_url, function(data) {
+      console.log(data);
+      switch (data.status) {
+        case "unknown":
+            flash_alert("Unknown job id", "danger");
+            $("#submit").removeAttr("disabled");
+            break;
+        case "finished":
+            flash_alert(data.result, "success");
+            $("#submit").removeAttr("disabled");
+            break;
+        case "failed":
+            flash_alert("Job failed: " + data.message, "danger");
+            $("#submit").removeAttr("disabled");
+            break;
+        default:
+          // queued/started/deferred
+          setTimeout(function() {
+            check_job_status(status_url);
+          }, 500);
+      }
+    });
+  }
+
   // submit form
   $("#submit").on('click', function() {
     var task = $("#task").val();
@@ -28,8 +53,11 @@ $(document).ready(function() {
       data: $("#taskForm").serialize(),
       method: "POST",
       dataType: "json",
-      success: function(data) {
-        flash_alert("Job " + data.job_id + " started...", "info", false);
+      success: function(data, status, request) {
+        $("#submit").attr("disabled", "disabled");
+        flash_alert("Running " + task + "...", "info");
+        var status_url = request.getResponseHeader('Location');
+        check_job_status(status_url);
       },
       error: function(jqXHR, textStatus, errorThrown) {
         flash_alert("Failed to start " + task, "danger");

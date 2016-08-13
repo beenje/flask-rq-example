@@ -10,7 +10,7 @@ This module implements the main blueprint.
 
 """
 import redis
-from flask import Blueprint, render_template, request, jsonify, current_app, g
+from flask import Blueprint, render_template, request, jsonify, current_app, g, url_for
 from rq import push_connection, pop_connection, Queue
 from .. import tasks
 from .forms import TaskForm
@@ -36,12 +36,28 @@ def pop_rq_connection(exception=None):
     pop_connection()
 
 
+@bp.route('/status/<job_id>')
+def job_status(job_id):
+    q = Queue()
+    job = q.fetch_job(job_id)
+    if job is None:
+        response = {'status': 'unknown'}
+    else:
+        response = {
+            'status': job.get_status(),
+            'result': job.result,
+        }
+        if job.is_failed:
+            response['message'] = job.exc_info.strip().split('\n')[-1]
+    return jsonify(response)
+
+
 @bp.route('/_run_task', methods=['POST'])
 def run_task():
     task = request.form.get('task')
     q = Queue()
     job = q.enqueue(tasks.run, task)
-    return jsonify({'job_id': job.get_id()})
+    return jsonify({}), 202, {'Location': url_for('main.job_status', job_id=job.get_id())}
 
 
 @bp.route('/')
